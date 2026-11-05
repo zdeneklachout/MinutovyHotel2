@@ -53,8 +53,10 @@ int main()
 
     for(int i = 0; i < 10000; i++)
     {
-        if (InputStop(i, Input) == '$') priceCalculation();
-        else if (InputStop(i, Input) == '#') stayDuration();
+        char v = InputStop(i,Input);
+
+        if (v == '$') priceCalculation();
+        else if (v == '#') stayDuration();
         else return 1;
     }
 
