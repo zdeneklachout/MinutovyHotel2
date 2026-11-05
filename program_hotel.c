@@ -31,7 +31,7 @@ void priceCalculation()
 
 }
 
-char InputStop(int i, int *input)
+char InputStop(int i, DataInput *input)
 {
     while(true)
     {
@@ -43,7 +43,7 @@ char InputStop(int i, int *input)
     }
 
     if (*(&input[i].specialCharacter) == '$') return '$';
-    else if (*(&input[i].specialCharacter == '#')return '#');
+    else if (*(&input[i].specialCharacter) == '#') return '#';
 }
 
 
