@@ -15,24 +15,28 @@ typedef struct
     int price;
 }DataInput;
 
-bool leapYear(int year)
+bool leapYear(int *currentYear)
 {
-    if (year%4 == 0 && year%100 == 0 && year%400 == 0) return true;
-    else if (year%4 == 0 && year%100 == 0) return false;
-    else if (year%4 == 0) return true;
+    if (*currentYear%4 == 0 && *currentYear%100 == 0 && *currentYear%400 == 0) return true;
+    else if (*currentYear%4 == 0 && *currentYear%100 == 0) return false;
+    else if (*currentYear%4 == 0) return true;
     else return false;
 }
 
-void dateCheck(DataInput *input)
+bool dateCheck(int i, DataInput *input)
 {
-    if (year < 2000
-        || month < 1 || month > 12
-        || day < 1 || day > 31
-        || (day > 30 && month == 4) || (day > 30 && month == 6) || (day > 30 && month == 9) || (day > 30 && month == 11)
-        || (day > 29 && month == 2 && pR == true)
-        || (day > 28 && month == 2 && pR == false)) return 0;
-}
+    bool pR = leapYear(&input[i].year);
 
+    if (input[i].year < 2000 || input[i].year > 2999
+        || input[i].month < 1 || input[i].month > 12
+        || input[i].day < 1 || input[i].day > 31
+        || (input[i].day > 30 && input[i].month == 4) || (input[i].day > 30 && input[i].month == 6) || (input[i].day > 30 && input[i].month == 9) || (input[i].day > 30 && input[i].month == 11)
+        || (input[i].day > 29 && input[i].month == 2 && pR == true)
+        || (input[i].day > 28 && input[i].month == 2 && pR == false)
+        || input[i].hour < 0 || input[i].hour > 23
+        || input[i].minute < 0 || input[i].minute > 59) return 0;
+}
+/*
 void stayDuration()
 {
 
@@ -42,7 +46,7 @@ void priceCalculation()
 {
 
 }
-
+*/
 char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenarazí na $ nebo #
 {   
 
@@ -55,9 +59,9 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
             return 'N';
         }
 
-        printf("%c %d %c %d %c %d %d %c %d %c %d\n",*(&input[i].specialCharacter), *(&input[i].year), *(&input[i].separatorDash), *(&input[i].month), 
-        *(&input[i].separatorDash), *(&input[i].day), *(&input[i].hour), *(&input[i].separatorColon), 
-        *(&input[i].minute), *(&input[i].separatorComma), *(&input[i].price)); 
+        printf("%c %d %c %d %c %d %d %c %d %c %d\n", input[i].specialCharacter, input[i].year, input[i].separatorDash, input[i].month,
+        input[i].separatorDash, input[i].day, input[i].hour,input[i].separatorColon,
+        input[i].minute, input[i].separatorComma, input[i].price);
 
         if (*(&input[i].specialCharacter) == '$') return '$';
         else if (*(&input[i].specialCharacter) == '#') return '#';
@@ -65,7 +69,6 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
         return '+';
     }
 
-    
 }
 
 
@@ -78,11 +81,12 @@ int main()
     {
         char v = InputStop(i,Input);
 
+        if (dateCheck(i,Input) == false) return 1;
+
         if (v == '$') priceCalculation();
         else if (v == '#') stayDuration();
         else if (v == 'N') return 1;
 
-        dateCheck(Input);
 
     }
 
