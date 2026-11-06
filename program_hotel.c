@@ -36,7 +36,7 @@ bool dateCheck(int i, DataInput *input)
         || input[i].hour < 0 || input[i].hour > 23
         || input[i].minute < 0 || input[i].minute > 59) return 0;
 }
-/*
+
 void stayDuration()
 {
 
@@ -46,27 +46,44 @@ void priceCalculation()
 {
 
 }
-*/
+
 char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenarazí na $ nebo #
 {   
+    int pocet = 0;
 
     while(true)
     {
-        if (scanf(" %c %d %c %d %c %d %d %c %d %c %d", &input[i].specialCharacter, &input[i].year, &input[i].separatorDash, &input[i].month,
-            &input[i].separatorDash, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].price ) != 11)
+        pocet = 10;
+
+        if (scanf(" %c", &input[i].specialCharacter) != 1)
         {
             printf("Nespravny vstup.\n");
             return 'N';
         }
 
-        printf("%c %d %c %d %c %d %d %c %d %c %d\n", input[i].specialCharacter, input[i].year, input[i].separatorDash, input[i].month,
-        input[i].separatorDash, input[i].day, input[i].hour,input[i].separatorColon,
-        input[i].minute, input[i].separatorComma, input[i].price);
+        if (*(&input[i].specialCharacter) == '$') pocet = 9;
 
-        if (*(&input[i].specialCharacter) == '$') return '$';
+        for (int j = pocet; j <= 10; j++)
+        {
+            if (scanf("%c %d %c %d %c %d %d %c %d %c %d", &input[i].specialCharacter, &input[i].year, // !! &input[i].separatorDash, &input[i].month,
+                &input[i].separatorDash, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].price ) != pocet)
+            {
+                printf("Nespravny vstup.\n");
+                return 'N';
+            }
+
+        }
+
+        if (pocet == 9) return '$';
         else if (*(&input[i].specialCharacter) == '#') return '#';
 
         return '+';
+
+        /*
+         p r*intf("%c %d %c %d %c %d %d %c %d %c %d\n", input[i].specialCharacter, input[i].year, input[i].separatorDash, input[i].month,
+         input[i].separatorDash, input[i].day, input[i].hour,input[i].separatorColon,
+         input[i].minute, input[i].separatorComma, input[i].price);
+         */
     }
 
 }
