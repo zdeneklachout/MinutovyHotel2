@@ -87,7 +87,7 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
         printf("%c %d %c %d %c %d %d %c %d %c %d\n", input[i].specialCharacter, input[i].year, input[i].separatorDash, input[i].month,
                input[i].separatorDash, input[i].day, input[i].hour,input[i].separatorColon,
                input[i].minute, input[i].separatorComma, input[i].price);
-*/
+        */
 
         if (d) return '$';
         else if (*(&input[i].specialCharacter) == '#') return '#';
