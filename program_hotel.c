@@ -3,7 +3,8 @@
 typedef struct
 {
     char specialCharacter;
-    char separatorDash; 
+    char separatorDash1;  
+    char separatorDash2;
     char separatorColon;
     char separatorComma;
 
@@ -14,8 +15,9 @@ typedef struct
     int minute;
     int price; 
 
-    // proměnné pro opraci $
-    char separatorDash2; 
+    // proměnné pro opraci $ 
+    char separatorDash_1;
+    char separatorDash_2; 
     char separatorColon2; 
     int year2;  
     int month2; 
@@ -102,7 +104,9 @@ bool dateCheck(int i, DataInput *input, char v)
         || (input[i].day > 29 && input[i].month == 2 && pR == true)
         || (input[i].day > 28 && input[i].month == 2 && pR == false)
         || input[i].hour < 0 || input[i].hour > 23
-        || input[i].minute < 0 || input[i].minute > 59) return 0; 
+        || input[i].minute < 0 || input[i].minute > 59  
+        || input[i].separatorDash1 != '-' || input[i].separatorDash2 != '-' 
+        || input[i].separatorColon != ':' || input[i].separatorComma != ',') return 0; 
     
     
     if (v == '$') 
@@ -114,7 +118,9 @@ bool dateCheck(int i, DataInput *input, char v)
         || (input[i].day2 > 29 && input[i].month2 == 2 && pR == true)
         || (input[i].day2 > 28 && input[i].month2 == 2 && pR == false)
         || input[i].hour2 < 0 || input[i].hour2 > 23
-        || input[i].minute2 < 0 || input[i].minute2 > 59) return 0; 
+        || input[i].minute2 < 0 || input[i].minute2 > 59 
+        || input[i].separatorDash_1 != '-' || input[i].separatorDash_2 != '-' 
+        || input[i].separatorColon2 != ':') return 0; 
     } 
 
     if (dateComparation(i, input, v) == false) return 0;
@@ -149,8 +155,8 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
         
         if (!d) 
         {
-             if (scanf(" %d %c %d %c %d %d %c %d %c %d", &input[i].year, &input[i].separatorDash, &input[i].month, // !!
-                &input[i].separatorDash, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].price ) != 10)
+             if (scanf(" %d %c %d %c %d %d %c %d %c %d", &input[i].year, &input[i].separatorDash1, &input[i].month, // !!
+                &input[i].separatorDash2, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].price ) != 10)
             {
                 printf("Nespravny vstup.\n");
                 return 'N';
@@ -159,9 +165,9 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
         else 
         {
             
-            if (scanf(" %d %c %d %c %d %d %c %d %c %d %c %d %c %d %d %c %d", &input[i].year, &input[i].separatorDash, &input[i].month, // !!
-                &input[i].separatorDash, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].year2,
-                &input[i].separatorDash2, &input[i].month2, &input[i].separatorDash2,&input[i].day2, &input[i].hour2, &input[i].separatorColon2, &input[i].minute2) != 17)
+            if (scanf(" %d %c %d %c %d %d %c %d %c %d %c %d %c %d %d %c %d", &input[i].year, &input[i].separatorDash1, &input[i].month, // !!
+                &input[i].separatorDash2, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].year2,
+                &input[i].separatorDash_1, &input[i].month2, &input[i].separatorDash_2,&input[i].day2, &input[i].hour2, &input[i].separatorColon2, &input[i].minute2) != 17)
             {   
                 printf("Nespravny vstup.\n");
                 return 'N';
