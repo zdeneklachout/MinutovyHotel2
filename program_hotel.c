@@ -35,6 +35,8 @@ bool dateCheck(int i, DataInput *input)
         || (input[i].day > 28 && input[i].month == 2 && pR == false)
         || input[i].hour < 0 || input[i].hour > 23
         || input[i].minute < 0 || input[i].minute > 59) return 0;
+
+    return 1;
 }
 
 void stayDuration()
@@ -54,6 +56,7 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
     while(true)
     {
         pocet = 10;
+        bool d = false;
 
         if (scanf(" %c", &input[i].specialCharacter) != 1)
         {
@@ -61,11 +64,17 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
             return 'N';
         }
 
-        if (*(&input[i].specialCharacter) == '$') pocet = 9;
+        if (*(&input[i].specialCharacter) == '$')
+        {
+            pocet = 9;
+            d = true;
+        }
 
         for (int j = pocet; j <= 10; j++)
         {
-            if (scanf("%c %d %c %d %c %d %d %c %d %c %d", &input[i].specialCharacter, &input[i].year, // !! &input[i].separatorDash, &input[i].month,
+            if (j == 10 && d == true) pocet = 8;
+
+            if (scanf(" %d %c %d %c %d %d %c %d %c %d", &input[i].year, &input[i].separatorDash, &input[i].month, // !!
                 &input[i].separatorDash, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].price ) != pocet)
             {
                 printf("Nespravny vstup.\n");
@@ -74,16 +83,18 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
 
         }
 
-        if (pocet == 9) return '$';
+        /*
+        printf("%c %d %c %d %c %d %d %c %d %c %d\n", input[i].specialCharacter, input[i].year, input[i].separatorDash, input[i].month,
+               input[i].separatorDash, input[i].day, input[i].hour,input[i].separatorColon,
+               input[i].minute, input[i].separatorComma, input[i].price);
+*/
+
+        if (d) return '$';
         else if (*(&input[i].specialCharacter) == '#') return '#';
 
         return '+';
 
-        /*
-         p r*intf("%c %d %c %d %c %d %d %c %d %c %d\n", input[i].specialCharacter, input[i].year, input[i].separatorDash, input[i].month,
-         input[i].separatorDash, input[i].day, input[i].hour,input[i].separatorColon,
-         input[i].minute, input[i].separatorComma, input[i].price);
-         */
+
     }
 
 }
