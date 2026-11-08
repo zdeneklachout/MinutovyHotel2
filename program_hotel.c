@@ -133,9 +133,39 @@ void stayDuration()
 
 }
 
-void priceCalculation()
-{
+void priceCalculation(int i, DataInput *input)
+{   
+    int r = 0; 
+    long long minutyRok = 0; 
 
+    for (int l = &input[i].year; l < &input[i+1].year; l++) // jenom pro '+'
+    {
+        if (leapYear(&l) == true) r = 527040;   
+        else r = 525600;
+        minutyRok += r;
+    } 
+
+    int m = 0;  
+    int minutyMesic = 0; 
+
+    for (int k = 1; k < &input[i].month; k++) 
+    {
+        // ruzne hodnoty pro ruzne mesice
+    }
+
+
+
+
+    int d = 1440; 
+    int h = 60; 
+
+    int minutyDen = (input[i].day - 1) * d; 
+    int minutyHodina = (input[i].hour -1) * h; 
+    int minuty = (input[i].minute); 
+
+    long long celkemMinut;
+
+    celkemMinut = minutyRok + minutyMesic + minutyDen + minutyHodina + minuty;
 }
 
 char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenarazí na $ nebo #
@@ -180,11 +210,9 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
 
         return '+';
 
-
     }
 
 }
-
 
 int main()
 {
@@ -197,8 +225,8 @@ int main()
 
         if (dateCheck(i,Input,v) == false) return 1;
 
-        if (v == '$') priceCalculation();
-        else if (v == '#') stayDuration();
+        priceCalculation(i,Input);
+        if (v == '#') stayDuration();
         else if (v == 'N') return 1;
 
 
