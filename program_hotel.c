@@ -1,4 +1,5 @@
-#include<stdio.h>
+#include <stdio.h>
+#include <stdlib.h> 
 
 typedef struct
 {
@@ -13,9 +14,9 @@ typedef struct
     int day;
     int hour;
     int minute;
-    int price; 
+    int minutePrice; 
 
-    int totalMinutes; 
+    long long totalMinutes; 
 
     // proměnné pro opraci $ 
     char separatorDash_1;
@@ -25,7 +26,11 @@ typedef struct
     int month2; 
     int day2; 
     int hour2; 
-    int minute2;
+    int minute2; 
+
+    long long totalMinutes2; 
+
+    long long price;
     
 }DataInput;
 
@@ -131,31 +136,36 @@ bool DateCheck(int i, DataInput *input, char v) // kontroluje jestli je datum pl
     return 1;
 }
 
-int MinutesYear(int r, int minutesYear, DataInput *input, int i, char v) // patří k nedokončená logice u $
+void MinutesYear(DataInput *input, int i, char v) // počítá minuty které uplynuly od roku 2000
 {   
+    int r = 0;
+
+    input[i].totalMinutes = 0; 
+    input[i].totalMinutes2 = 0;
+
+    for (int l = 2000; l < input[i].year; l++) 
+    {
+        if (LeapYear(&l) == true) r = 527040;   
+        else r = 525600;
+        input[i].totalMinutes += r;
+    }   
+
     if (v == '$') 
     {
-        for (int l = input[i].year; l < input[0].year; l++) 
+        for (int l = 2000; l < input[i].year2; l++) 
         {
             if (LeapYear(&l) == true) r = 527040;   
             else r = 525600;
-            minutesYear += r;
+            input[i].totalMinutes2 += r;
         } 
+    } 
 
-        for (int m = input[i-1].year; m < input[i].year2; m++) 
-        {
-            if (LeapYear(&m) == true) r = 527040;   
-            else r = 525600;
-            minutesYear += r;
-        }  
-
-    }
-    
-    return minutesYear;
 } 
 
-int MinutesMonth(int m, DataInput *input, int minutesMonth, int i) // patří k nedokončený logice u $
-{
+void MinutesMonth(DataInput *input, int i, char v) // počítá v minuty které uplnuly od ledna do konce předešlého měsíce
+{   
+    int m = 0;
+
     for (int k = 1; k < input[i].month; k++) 
     {
         // ruzne hodnoty pro ruzne mesice 
@@ -164,10 +174,23 @@ int MinutesMonth(int m, DataInput *input, int minutesMonth, int i) // patří k 
         else if (k == 2 && LeapYear(&input[i].year) == false) m = 28;
         else m = 29;
 
-        minutesMonth += m;
+        input[i].totalMinutes += m * 1440;
+    } 
+
+    if (v == '$') 
+    {
+        for (int k = 1; k < input[i].month2; k++) 
+        {
+            // ruzne hodnoty pro ruzne mesice 
+            if (k == 1 || k == 3 || k == 5 || k == 7 || k == 8 || k == 10) m = 31; 
+            else if (k == 4 || k == 6 || k == 9 || k == 11) m = 30;
+            else if (k == 2 && LeapYear(&input[i].year2) == false) m = 28;
+            else m = 29;
+
+            input[i].totalMinutes2 += m * 1440;
+        } 
     }
 
-    return minutesMonth;
 }
 
 void StayDuration()
@@ -175,29 +198,56 @@ void StayDuration()
 
 }
 
-void PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
+int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
 {   
-    int r = 0; 
-    long long minutesYear = 0; 
+    long long totalPrice = 0;
 
-    minutesYear = MinutesYear(r, minutesYear, input, i, v); 
+    MinutesYear(input, i, v); 
 
-    int m = 0;  
-    int minutesMonth = 0; 
-
-    minutesMonth = MinutesMonth(m, input, minutesMonth, i); 
+    MinutesMonth(input, i, v); 
 
     int d = 1440; 
     int h = 60; 
 
-    int minutesDay = (input[i].day - 1) * d; 
-    int minutesHour = (input[i].hour -1) * h; 
-    int minuty = (input[i].minute); 
+    input[i].totalMinutes += (input[i].day - 1) * d; 
+    input[i].totalMinutes += (input[i].hour -1) * h; 
+    input[i].totalMinutes += (input[i].minute); 
 
-    long long totalMinutes;
 
-    totalMinutes = minutesYear + minutesMonth + minutesDay + minutesHour + minuty; 
-    input[i].totalMinutes = totalMinutes;
+    if (i != 0 && v != '$') 
+    {
+        input[i].price = (input[i].totalMinutes - input[i-1].totalMinutes) * input[i-1].minutePrice;
+    } 
+
+    if (v == '$') 
+    {   
+        input[i].totalMinutes2 += (input[i].day - 1) * d; 
+        input[i].totalMinutes2 += (input[i].hour -1) * h; 
+        input[i].totalMinutes2 += (input[i].minute); 
+
+        for (int j = 0; j <= i; j++) 
+        {
+
+            if (j == 0) 
+            {
+                input[j].price = abs((input[j].totalMinutes - input[i].totalMinutes)) * input[j].minutePrice;
+
+            }
+            else if (j == i) 
+            {
+                input[i].price = (input[i].totalMinutes2 - input[i-1].totalMinutes) * input[i-1].minutePrice; 
+            } 
+            else 
+            {
+                input[i].price = (input[i].totalMinutes - input[i-1].totalMinutes) * input[i-1].minutePrice;  
+                
+            }
+        }
+
+    }  
+
+    return totalPrice;
+ 
 }
 
 char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenarazí na $ nebo #
@@ -218,7 +268,7 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
         if (!d) 
         {
              if (scanf(" %d %c %d %c %d %d %c %d %c %d", &input[i].year, &input[i].separatorDash1, &input[i].month, 
-                &input[i].separatorDash2, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].price ) != 10)
+                &input[i].separatorDash2, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].minutePrice ) != 10)
             {
                 printf("Nespravny vstup.\n");
                 return 'N';
@@ -258,7 +308,8 @@ int main()
 
         if (DateCheck(i,Input,v) == false) return 1;
 
-        if (v == '$') PriceCalculation(i,Input,v);
+        PriceCalculation(i,Input,v); 
+
         if (v == '#') StayDuration();
         else if (v == 'N') return 1;
 
