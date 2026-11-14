@@ -15,6 +15,8 @@ typedef struct
     int minute;
     int price; 
 
+    int totalMinutes; 
+
     // proměnné pro opraci $ 
     char separatorDash_1;
     char separatorDash_2; 
@@ -27,7 +29,7 @@ typedef struct
     
 }DataInput;
 
-bool leapYear(int *currentYear)
+bool LeapYear(int *currentYear)
 {
     if (*currentYear%4 == 0 && *currentYear%100 == 0 && *currentYear%400 == 0) return true;
     else if (*currentYear%4 == 0 && *currentYear%100 == 0) return false;
@@ -35,14 +37,14 @@ bool leapYear(int *currentYear)
     else return false;
 }
 
-bool dateComparation(int i, DataInput *input, char v) 
+bool DateComparation(int i, DataInput *input, char v)  // kontroluje rostoucí posloupnost u '+' a aby byl druhý datum větší u '$'
 {   
     long long a = 0; 
     long long b = 0; 
 
     if (v == '$') 
     { 
-        // porovnavani dvou dat primo ze 1 struktury  
+        // porovnavani dvou dat primo ze 1 struktury
         a += input[i].year * 100; 
         a += input[i].month;
         a = a * 100;   
@@ -65,9 +67,10 @@ bool dateComparation(int i, DataInput *input, char v)
     } 
     else 
     {   
-        if (i > 0) 
+        if (i > 0 && v != '$') 
         {
-            // porovnani dvou dat ze dvou struktur 
+            // kontroluje jestli '+' tvoří rostroucí posloupnost 
+
             a += input[i].year * 100; 
             a += input[i].month;
             a = a * 100;   
@@ -93,9 +96,9 @@ bool dateComparation(int i, DataInput *input, char v)
     return 1;
 }
 
-bool dateCheck(int i, DataInput *input, char v)
+bool DateCheck(int i, DataInput *input, char v) // kontroluje jestli je datum platný
 {
-    bool pR = leapYear(&input[i].year);
+    bool pR = LeapYear(&input[i].year);
 
     if (input[i].year < 2000 || input[i].year > 2999
         || input[i].month < 1 || input[i].month > 12
@@ -123,49 +126,78 @@ bool dateCheck(int i, DataInput *input, char v)
         || input[i].separatorColon2 != ':') return 0; 
     } 
 
-    if (dateComparation(i, input, v) == false) return 0;
+    if (DateComparation(i, input, v) == false) return 0;
 
     return 1;
 }
 
-void stayDuration()
+int MinutesYear(int r, int minutesYear, DataInput *input, int i, char v) // patří k nedokončená logice u $
+{   
+    if (v == '$') 
+    {
+        for (int l = input[i].year; l < input[0].year; l++) 
+        {
+            if (LeapYear(&l) == true) r = 527040;   
+            else r = 525600;
+            minutesYear += r;
+        } 
+
+        for (int m = input[i-1].year; m < input[i].year2; m++) 
+        {
+            if (LeapYear(&m) == true) r = 527040;   
+            else r = 525600;
+            minutesYear += r;
+        }  
+
+    }
+    
+    return minutesYear;
+} 
+
+int MinutesMonth(int m, DataInput *input, int minutesMonth, int i) // patří k nedokončený logice u $
+{
+    for (int k = 1; k < input[i].month; k++) 
+    {
+        // ruzne hodnoty pro ruzne mesice 
+        if (k == 1 || k == 3 || k == 5 || k == 7 || k == 8 || k == 10) m = 31; 
+        else if (k == 4 || k == 6 || k == 9 || k == 11) m = 30;
+        else if (k == 2 && LeapYear(&input[i].year) == false) m = 28;
+        else m = 29;
+
+        minutesMonth += m;
+    }
+
+    return minutesMonth;
+}
+
+void StayDuration()
 {
 
 }
 
-void priceCalculation(int i, DataInput *input)
+void PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
 {   
     int r = 0; 
-    long long minutyRok = 0; 
+    long long minutesYear = 0; 
 
-    for (int l = &input[i].year; l < &input[i+1].year; l++) // jenom pro '+'
-    {
-        if (leapYear(&l) == true) r = 527040;   
-        else r = 525600;
-        minutyRok += r;
-    } 
+    minutesYear = MinutesYear(r, minutesYear, input, i, v); 
 
     int m = 0;  
-    int minutyMesic = 0; 
+    int minutesMonth = 0; 
 
-    for (int k = 1; k < &input[i].month; k++) 
-    {
-        // ruzne hodnoty pro ruzne mesice
-    }
-
-
-
+    minutesMonth = MinutesMonth(m, input, minutesMonth, i); 
 
     int d = 1440; 
     int h = 60; 
 
-    int minutyDen = (input[i].day - 1) * d; 
-    int minutyHodina = (input[i].hour -1) * h; 
+    int minutesDay = (input[i].day - 1) * d; 
+    int minutesHour = (input[i].hour -1) * h; 
     int minuty = (input[i].minute); 
 
-    long long celkemMinut;
+    long long totalMinutes;
 
-    celkemMinut = minutyRok + minutyMesic + minutyDen + minutyHodina + minuty;
+    totalMinutes = minutesYear + minutesMonth + minutesDay + minutesHour + minuty; 
+    input[i].totalMinutes = totalMinutes;
 }
 
 char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenarazí na $ nebo #
@@ -185,7 +217,7 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
         
         if (!d) 
         {
-             if (scanf(" %d %c %d %c %d %d %c %d %c %d", &input[i].year, &input[i].separatorDash1, &input[i].month, // !!
+             if (scanf(" %d %c %d %c %d %d %c %d %c %d", &input[i].year, &input[i].separatorDash1, &input[i].month, 
                 &input[i].separatorDash2, &input[i].day, &input[i].hour, &input[i].separatorColon, &input[i].minute, &input[i].separatorComma, &input[i].price ) != 10)
             {
                 printf("Nespravny vstup.\n");
@@ -217,16 +249,17 @@ char InputStop(int i, DataInput *input)  // Dává vstup na kousky dokud nenaraz
 int main()
 {
     printf("Operace:\n");
-    DataInput Input[10000];
+    DataInput Input[10000]; // pole struktur 
 
-    for(int i = 0; i < 10000; i++)
+    for (int i = 0; i < 10000; i++)
     {
         char v = InputStop(i,Input);
 
-        if (dateCheck(i,Input,v) == false) return 1;
 
-        priceCalculation(i,Input);
-        if (v == '#') stayDuration();
+        if (DateCheck(i,Input,v) == false) return 1;
+
+        if (v == '$') PriceCalculation(i,Input,v);
+        if (v == '#') StayDuration();
         else if (v == 'N') return 1;
 
 
