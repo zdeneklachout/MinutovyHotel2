@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h> 
 
 typedef struct
 {
@@ -201,6 +200,7 @@ void StayDuration()
 int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
 {   
     long long totalPrice = 0;
+    bool a = false; 
 
     MinutesYear(input, i, v); 
 
@@ -213,34 +213,43 @@ int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončen�
     input[i].totalMinutes += (input[i].hour -1) * h; 
     input[i].totalMinutes += (input[i].minute); 
 
-
-    if (i != 0 && v != '$') 
-    {
-        input[i].price = (input[i].totalMinutes - input[i-1].totalMinutes) * input[i-1].minutePrice;
-    } 
-
     if (v == '$') 
     {   
-        input[i].totalMinutes2 += (input[i].day - 1) * d; 
-        input[i].totalMinutes2 += (input[i].hour -1) * h; 
-        input[i].totalMinutes2 += (input[i].minute); 
+        input[i].totalMinutes2 += (input[i].day2 - 1) * d; 
+        input[i].totalMinutes2 += (input[i].hour2 -1) * h; 
+        input[i].totalMinutes2 += (input[i].minute2); 
 
         for (int j = 0; j <= i; j++) 
         {
 
             if (j == 0) 
             {
-                input[j].price = abs((input[j].totalMinutes - input[i].totalMinutes)) * input[j].minutePrice;
+                input[j].price = input[j].totalMinutes - input[i].totalMinutes * input[j].minutePrice; 
+
+                if (input[j].price < 0) a = true; 
+                else totalPrice += input[j].price;
 
             }
             else if (j == i) 
             {
-                input[i].price = (input[i].totalMinutes2 - input[i-1].totalMinutes) * input[i-1].minutePrice; 
+                input[i-1].price = (input[i].totalMinutes2 - input[i-1].totalMinutes) * input[i-1].minutePrice; 
+                totalPrice += input[i-1].price;
             } 
             else 
-            {
-                input[i].price = (input[i].totalMinutes - input[i-1].totalMinutes) * input[i-1].minutePrice;  
+            {   
+                if (a == true) 
+                {
+                    input[j-1].price = (input[j].totalMinutes - input[i].totalMinutes) * input[j-1].minutePrice;  
+                    totalPrice += input[j-1].price;  
+                    a = false;
+                } 
+                else 
+                {
+                    input[j-1].price = (input[j].totalMinutes - input[j-1].totalMinutes) * input[j-1].minutePrice;  
+                    totalPrice += input[j-1].price; 
+                }
                 
+
             }
         }
 
@@ -304,11 +313,11 @@ int main()
     for (int i = 0; i < 10000; i++)
     {
         char v = InputStop(i,Input);
-
+        int totalPrice = 0;
 
         if (DateCheck(i,Input,v) == false) return 1;
 
-        PriceCalculation(i,Input,v); 
+        totalPrice = PriceCalculation(i,Input,v); 
 
         if (v == '#') StayDuration();
         else if (v == 'N') return 1;
