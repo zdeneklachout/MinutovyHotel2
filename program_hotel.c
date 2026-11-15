@@ -142,6 +142,7 @@ void MinutesYear(DataInput *input, int i, char v) // počítá minuty které upl
     int r = 0;
 
     input[i].totalMinutes = 0;  
+
     input[i].totalMinutesD = 0;
     input[i].totalMinutes2D = 0;
 
@@ -217,9 +218,11 @@ void MinutesMonth(DataInput *input, int i, char v) // počítá v minuty které 
 
 }
 
-void StayDuration()
+void StayDuration(int i, DataInput *input, char v)
 {
-
+    MinutesYear(input, i, v); 
+    
+    MinutesMonth(input, i, v);
 }
 
 int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
@@ -339,13 +342,13 @@ int main()
         char v = InputStop(i,Input);
         long long totalPrice = 0;
 
-        if (DateCheck(i,Input,v) == false) return 1;
+        if (DateCheck(i,Input,v) == false) {printf("Nespravny vstup.\n"); return 1;}
 
         totalPrice = PriceCalculation(i,Input,v);  
         if (totalPrice > 0) printf("%lld\n", totalPrice); 
         else if (totalPrice == -1) return 1;
         
-        if (v == '#') StayDuration();
+        if (v == '#') StayDuration(i,Input,v);
         else if (v == 'N') return 1;
 
 
