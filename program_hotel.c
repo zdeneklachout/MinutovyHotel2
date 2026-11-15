@@ -262,7 +262,8 @@ void MinuteCalculator(int i,DataInput *input, char v)
 void StayDuration(int i, DataInput *input, char v)
 {
     long long maxPrice = input[i].minutePrice; 
-    long long currentMinute = input[i].totalMinutes;
+    long long currentMinute = input[i].totalMinutes; 
+    long long spentMoney = 0;
     int j = 0;
 
     while (input[j].totalMinutes < currentMinute && j < i) 
@@ -278,10 +279,41 @@ void StayDuration(int i, DataInput *input, char v)
 
     for (int k = maxPrice; k > 0; k -= input[j-1].minutePrice) 
     {   
-        if (input[j].specialCharacter == '+' 
-            && j < i && currentMinute > input[j].totalMinutes) j++;
+        currentMinute++; 
 
-        currentMinute ++;
+        while(j < i && input[j].specialCharacter != '+') j++;
+
+        while (input[j].specialCharacter == '+' 
+            && j < i && currentMinute >= input[j].totalMinutes) j++; 
+
+        spentMoney += input[j-1].minutePrice;
+    } 
+
+    // minuty na datum 
+    int y = 2000; 
+    int yearMinutes = 525600; 
+    int leapYearMinutes = 527040;
+
+    while (true) 
+    {   
+        if (LeapYear(&y) == true)  // prestupny
+        {
+            if (currentMinute > yearMinutes) 
+            {
+                currentMinute -= leapYearMinutes; 
+                y++;
+            }
+        }  
+        else  // normalni
+        {
+            if (currentMinute > yearMinutes) 
+            {
+                currentMinute -= yearMinutes; 
+                y++;
+            }
+        }
+
+       
     }
 }
 
