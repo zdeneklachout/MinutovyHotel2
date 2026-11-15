@@ -228,8 +228,11 @@ void MinuteCalculator(int i,DataInput *input, char v)
         MinutesYear(input, i, v);  
         MinutesMonth(input, i, v); 
 
-        input[i].totalMinutes += (input[i].day - 1) * d; 
-        input[i].totalMinutes += (input[i].hour -1) * h; 
+        input[i].totalMinutes += (input[i].day - 1) * d;  
+
+        if (input[i].hour != 0) input[i].totalMinutes += (input[i].hour -1) * h;
+        else input[i].totalMinutes += (input[i].hour) * h;
+
         input[i].totalMinutes += (input[i].minute); 
 
     } 
@@ -239,12 +242,18 @@ void MinuteCalculator(int i,DataInput *input, char v)
         MinutesYear(input, i, v);  
         MinutesMonth(input, i, v); 
 
-        input[i].totalMinutesD += (input[i].day - 1) * d; 
-        input[i].totalMinutesD += (input[i].hour -1) * h; 
+        input[i].totalMinutesD += (input[i].day - 1) * d;  
+
+        if (input[i].hour != 0) input[i].totalMinutesD += (input[i].hour -1) * h;
+        else input[i].totalMinutesD += (input[i].hour) * h;
+
         input[i].totalMinutesD += (input[i].minute); 
 
-        input[i].totalMinutes2D += (input[i].day2 - 1) * d; 
-        input[i].totalMinutes2D += (input[i].hour2 -1) * h; 
+        input[i].totalMinutes2D += (input[i].day2 - 1) * d;  
+
+        if (input[i].hour2 != 0) input[i].totalMinutes2D += (input[i].hour2 -1) * h;
+        else input[i].totalMinutes2D += (input[i].hour2) * h;
+
         input[i].totalMinutes2D += (input[i].minute2); 
 
     } 
@@ -252,39 +261,57 @@ void MinuteCalculator(int i,DataInput *input, char v)
 
 void StayDuration(int i, DataInput *input, char v)
 {
+    long long maxPrice = input[i].minutePrice; 
+    long long currentMinute = input[i].totalMinutes;
+    int j = 0;
 
+    while (input[j].totalMinutes < currentMinute && j < i) 
+    {
+        j++;
+    } 
+
+    if (j == 0) 
+    {
+        printf("N/A\n"); 
+        return;
+    }
+
+    for (int k = maxPrice; k > 0; k -= input[j-1].minutePrice) 
+    {   
+        if (input[j].specialCharacter == '+' 
+            && j < i && currentMinute > input[j].totalMinutes) j++;
+
+        currentMinute ++;
+    }
 }
 
-int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
+int PriceCalculation(int i, DataInput *input) 
 {   
     long long totalPrice = 0;
 
-    if (v == '$') 
-    {
-        for (long long m = input[i].totalMinutesD; m < input[i].totalMinutes2D; m ++) 
-        { 
-            int a = 0; 
-            int b = -1;
+    for (long long m = input[i].totalMinutesD; m < input[i].totalMinutes2D; m ++) 
+    { 
+        int a = 0; 
+        int b = -1;
 
-            while (a <= i && input[a].totalMinutes <= m) 
-            {   
-                if (input[a].specialCharacter == '+') 
-                { 
-                    b = a;
-                }  
-                a++;
+        while (a <= i && input[a].totalMinutes <= m) 
+        {   
+            if (input[a].specialCharacter == '+') 
+            { 
+                b = a;
+            }  
+            a++;
 
-            } 
+        } 
             
-            if (b != -1) 
-            {
-                totalPrice += input[b].minutePrice; 
-            } 
-            else 
-            {
-                printf("N/A\n"); 
-                return -1;
-            }
+        if (b != -1) 
+        {
+            totalPrice += input[b].minutePrice; 
+        } 
+        else 
+        {
+            printf("N/A\n"); 
+            return -1;
         }
     } 
 
@@ -354,7 +381,7 @@ int main()
 
         if (v == '$') 
         {
-            totalPrice = PriceCalculation(i,Input,v);  
+            totalPrice = PriceCalculation(i,Input);  
             if (totalPrice > 0) printf("%lld\n", totalPrice); 
             else if (totalPrice == -1) return 1;
         }
