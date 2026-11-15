@@ -46,7 +46,7 @@
         }, 
         {
           "description": "Automaticke presmerovani vstupu pro scanf ze souboru vstup.txt",
-          "text": "set args < ./sample/basic/CZE/0000_in.txt",
+          "text": "set args < ./sample/basic/CZE/0001_in.txt",
           "ignoreFailures": true
         }
       ]
