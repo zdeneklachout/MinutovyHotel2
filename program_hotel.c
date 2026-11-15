@@ -73,7 +73,7 @@ bool DateComparation(int i, DataInput *input, char v)  // kontroluje rostoucí p
     } 
     else 
     {   
-        if (i > 0 && v != '$') 
+        if (i > 0 && v != '$' && v != '#') 
         {
             // kontroluje jestli '+' tvoří rostroucí posloupnost 
 
@@ -218,40 +218,46 @@ void MinutesMonth(DataInput *input, int i, char v) // počítá v minuty které 
 
 }
 
-void StayDuration(int i, DataInput *input, char v)
-{
-    MinutesYear(input, i, v); 
-    
-    MinutesMonth(input, i, v);
-}
-
-int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
+void MinuteCalculator(int i,DataInput *input, char v) 
 {   
-    long long totalPrice = 0;
-
-    MinutesYear(input, i, v); 
-
-    MinutesMonth(input, i, v); 
-
     int d = 1440; 
-    int h = 60; 
+    int h = 60;  
 
-    if (v != '$') 
-    {
+    if (v == '+' || v == '#') 
+    {   
+        MinutesYear(input, i, v);  
+        MinutesMonth(input, i, v); 
+
         input[i].totalMinutes += (input[i].day - 1) * d; 
         input[i].totalMinutes += (input[i].hour -1) * h; 
         input[i].totalMinutes += (input[i].minute); 
-    }
-    else 
-    {   
+
+    } 
+    
+    if (v == '$') 
+    {
+        MinutesYear(input, i, v);  
+        MinutesMonth(input, i, v); 
+
         input[i].totalMinutesD += (input[i].day - 1) * d; 
         input[i].totalMinutesD += (input[i].hour -1) * h; 
         input[i].totalMinutesD += (input[i].minute); 
 
         input[i].totalMinutes2D += (input[i].day2 - 1) * d; 
         input[i].totalMinutes2D += (input[i].hour2 -1) * h; 
-        input[i].totalMinutes2D+= (input[i].minute2); 
-    }
+        input[i].totalMinutes2D += (input[i].minute2); 
+
+    } 
+}
+
+void StayDuration(int i, DataInput *input, char v)
+{
+
+}
+
+int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončená logika pro $
+{   
+    long long totalPrice = 0;
 
     if (v == '$') 
     {
@@ -344,9 +350,14 @@ int main()
 
         if (DateCheck(i,Input,v) == false) {printf("Nespravny vstup.\n"); return 1;}
 
-        totalPrice = PriceCalculation(i,Input,v);  
-        if (totalPrice > 0) printf("%lld\n", totalPrice); 
-        else if (totalPrice == -1) return 1;
+        MinuteCalculator(i,Input,v);
+
+        if (v == '$') 
+        {
+            totalPrice = PriceCalculation(i,Input,v);  
+            if (totalPrice > 0) printf("%lld\n", totalPrice); 
+            else if (totalPrice == -1) return 1;
+        }
         
         if (v == '#') StayDuration(i,Input,v);
         else if (v == 'N') return 1;
