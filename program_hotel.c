@@ -254,24 +254,30 @@ int PriceCalculation(int i, DataInput *input, char v) // absolutně nedokončen�
     {
         for (long long m = input[i].totalMinutesD; m < input[i].totalMinutes2D; m ++) 
         { 
-            int tmp = 0; 
-            int a = 1; 
+            int a = 0; 
+            int b = -1;
 
-            tmp = m - input[0].totalMinutes;
-
-            if (tmp > 0) printf("N/A\n");
-        
-            while (tmp <= 0) 
+            while (a <= i && input[a].totalMinutes <= m) 
             {   
-                tmp = m - input[a].totalMinutes;  // pokud narazim na $ tak se ta iterace skipne  
+                if (input[a].specialCharacter == '+') 
+                { 
+                    b = a;
+                }  
+                a++;
 
-                if (tmp ==  m) continue;
-                a += 1;
             } 
-
-            totalPrice += input[a-1].minutePrice;
+            
+            if (b != -1) 
+            {
+                totalPrice += input[b].minutePrice; 
+            } 
+            else 
+            {
+                printf("N/A\n"); 
+                return -1;
+            }
         }
-    }
+    } 
 
     return totalPrice;
  
@@ -335,9 +341,10 @@ int main()
 
         if (DateCheck(i,Input,v) == false) return 1;
 
-        totalPrice = PriceCalculation(i,Input,v); 
-        printf("%lld\n", totalPrice);
-
+        totalPrice = PriceCalculation(i,Input,v);  
+        if (totalPrice > 0) printf("%lld\n", totalPrice); 
+        else if (totalPrice == -1) return 1;
+        
         if (v == '#') StayDuration();
         else if (v == 'N') return 1;
 
